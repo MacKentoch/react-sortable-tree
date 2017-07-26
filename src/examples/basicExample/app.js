@@ -31,69 +31,117 @@ class App extends Component {
 
       flatTreeData: [],
       treeDataFromFlatData: [],
+      nodeKey: 'uniqueKey',
+      parentKey: 'parentKey',
 
       rootKey: 'COULD_BE_PRODUCT_KEY',
 
-      treeData: [ { "uniqueKey": "0A0", "parentKey": "COULD_BE_PRODUCT_KEY", "title": "v1", "subtitle": "key: 0A0", "expanded": true, "children": [ { "uniqueKey": "1A1", "parentKey": "0A0", "title": "v1.1", "subtitle": "key: 1A1", "expanded": false } ] }, { "uniqueKey": "2A2", "parentKey": "COULD_BE_PRODUCT_KEY", "title": "v1.2", "subtitle": "key: 2A2", "expanded": false }, { "uniqueKey": "3A3", "parentKey": "COULD_BE_PRODUCT_KEY", "title": "v2.1", "subtitle": "key: 3A3", "expanded": true, "children": [ { "uniqueKey": "4A4", "parentKey": "3A3", "title": "2.1.1", "subtitle": "key: 4A4", "expanded": true } ] }, { "uniqueKey": "5A5", "parentKey": "COULD_BE_PRODUCT_KEY", "title": "v3", "subtitle": "key: 5A5", "expanded": false }, { "uniqueKey": "6A6", "parentKey": "COULD_BE_PRODUCT_KEY", "title": "v4", "subtitle": "key: 6A6", "expanded": false, "children": [ { "uniqueKey": "7A", "parentKey": "6A6", "title": "v4.1", "subtitle": "key: 7A7", "expanded": false } ] } ],
-
-      // treeData: [
-      //   {
-      //     uniqueKey: '0A0',
-      //     parentKey: 'COULD_BE_PRODUCT_KEY',
-      //     title: 'v1',
-      //     subtitle: 'key: 0A0',
-      //     expanded: true,
-      //     children: [
-      //       {
-      //         uniqueKey: '1A1',
-      //         title: 'v1.1',
-      //         subtitle: 'key: 1A1',
-      //         // subtitle: 'Defined in `children` array belonging to parent',
-      //       },
-      //       {
-      //         uniqueKey: '2A2',
-      //         title: 'v1.2',
-      //         subtitle: 'key: 2A2',
-      //       },
-      //     ],
-      //   },
-      //   {
-      //     uniqueKey: '3A3',
-      //     expanded: true,
-      //     title: 'v2.1',
-      //     subtitle: 'key: 3A3',
-      //     children: [
-      //       {
-      //         uniqueKey: '4A4',
-      //         expanded: true,
-      //         title: '2.1.1',
-      //         subtitle: 'key: 4A4',
-      //       },
-      //     ],
-      //   },
-      //   {
-      //     uniqueKey: '5A5',
-      //     title: 'v3',
-      //     subtitle: 'key: 5A5',
-      //   },
-      //   {
-      //     uniqueKey: '6A6',
-      //     title: 'v4',
-      //     subtitle: 'key: 6A6',
-      //     children: [
-      //       {
-      //         uniqueKey: '7A',
-      //         title: 'v4.1',
-      //         subtitle: 'key: 7A7',
-      //       },
-      //     ],
-      //   }
-      // ],
+      treeData: [{
+        "uniqueKey": "0A0",
+        "parentKey": "COULD_BE_PRODUCT_KEY",
+        "title": "v1",
+        "subtitle": "key: 0A0",
+        "expanded": true,
+        "children": [{
+          "uniqueKey": "1A1",
+          "parentKey": "0A0",
+          "title": "v1.1",
+          "subtitle": "key: 1A1",
+          "expanded": true
+        }, {
+          "uniqueKey": "2A2",
+          "parentKey": "COULD_BE_PRODUCT_KEY",
+          "title": "v1.2",
+          "subtitle": "key: 2A2",
+          "expanded": false
+        }]
+      }, {
+        "uniqueKey": "3A3",
+        "parentKey": "COULD_BE_PRODUCT_KEY",
+        "title": "v2.1",
+        "subtitle": "key: 3A3",
+        "expanded": true,
+        "children": [{
+          "uniqueKey": "4A4",
+          "parentKey": "3A3",
+          "title": "2.1.1",
+          "subtitle": "key: 4A4",
+          "expanded": true
+        }]
+      }, {
+        "uniqueKey": "5A5",
+        "parentKey": "COULD_BE_PRODUCT_KEY",
+        "title": "v3",
+        "subtitle": "key: 5A5",
+        "expanded": false
+      }, {
+        "uniqueKey": "6A6",
+        "parentKey": "COULD_BE_PRODUCT_KEY",
+        "title": "v4",
+        "subtitle": "key: 6A6",
+        "expanded": false,
+        "children": [{
+          "uniqueKey": "7A",
+          "parentKey": "6A6",
+          "title": "v4.1",
+          "subtitle": "key: 7A7",
+          "expanded": false
+        }]
+      }]
     };
 
     this.updateTreeData = this.updateTreeData.bind(this);
     this.expandAll = this.expandAll.bind(this);
     this.collapseAll = this.collapseAll.bind(this);
+    this.createPathFromFlattenTreeData = this.createPathFromFlattenTreeData.bind(this);
+  }
+
+  createPathFromFlattenTreeData() {
+    const {
+      flatTreeData
+    } = this.state;
+
+    if (flatTreeData.length <= 0) {
+      return console.warn('flat treeData is empty now...');
+    }
+    
+    const rootKey   = this.state.rootKey;
+    const nodeKey   = this.state.nodeKey;
+    const parentKey = this.state.parentKey;
+
+    // get parent node for a node
+    const getDirectParentNode = node => flatTreeData.find(parent => parent[nodeKey] = node[parentKey]);
+    // get parent key for a node;
+    const getDirectParentNodeKey = node => getDirectParentNode(node)[nodeKey];
+
+    const getAllNodeKeysIntoArray = flatTreeData.map((node => node[nodeKey]));
+    const getAllDistinctParentKeys = flatTreeData.reduce(
+      (result, nextNode) => {
+        return result.some(cleParent => cleParent === nextNode[parentKey])
+          ? result
+          : [...result, nextNode[parentKey]];
+      },
+      []
+    );
+
+
+
+
+    // const hasParent     = node => thisNode[parentKey] !== rootKey
+
+    // const test = flatTreeData
+    //                 .map(node => {
+    //                    const parentNode =  getParentNode();
+    //                    if (hasParent(parentNode)) {
+
+    //                    }
+                       
+    //                 })
+
+    //                 .reduce((prevList, nextNode) => [...prevList, nextNode], [])
+    //                 .reverse();
+    console.log('createPathFromFlattenTreeData: getAllDistinctParentKeys: ', getAllDistinctParentKeys);
+    console.log('getAllNodeKeysIntoArray: ', getAllNodeKeysIntoArray);
   }
 
   expand(expanded) {
@@ -277,7 +325,7 @@ class App extends Component {
           </h4>
           <button onClick={this.expandAll}>Expand All</button>
           <button onClick={this.collapseAll}>Collapse All</button>
-          <button onClick={this.generateNodeInfo}>Generate node info</button>
+          <button onClick={this.createPathFromFlattenTreeData}>test something</button>
           &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
           <form
             style={{ display: 'inline-block' }}

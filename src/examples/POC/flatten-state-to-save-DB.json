@@ -1,0 +1,51 @@
+
+// flatten state:
+[{
+  "uniqueKey": "0A0",
+  "parentKey": "COULD_BE_PRODUCT_KEY",
+  "title": "v1",
+  "subtitle": "key: 0A0",
+  "expanded": true
+}, {
+  "uniqueKey": "1A1",
+  "parentKey": "0A0",
+  "title": "v1.1",
+  "subtitle": "key: 1A1",
+  "expanded": true
+}, {
+  "uniqueKey": "2A2",
+  "parentKey": "0A0",
+  "title": "v1.2",
+  "subtitle": "key: 2A2",
+  "expanded": false
+}, {
+  "uniqueKey": "3A3",
+  "parentKey": "COULD_BE_PRODUCT_KEY",
+  "title": "v2.1",
+  "subtitle": "key: 3A3",
+  "expanded": true
+}, {
+  "uniqueKey": "4A4",
+  "parentKey": "3A3",
+  "title": "2.1.1",
+  "subtitle": "key: 4A4",
+  "expanded": true
+}, {
+  "uniqueKey": "5A5",
+  "parentKey": "COULD_BE_PRODUCT_KEY",
+  "title": "v3",
+  "subtitle": "key: 5A5",
+  "expanded": false
+}, {
+  "uniqueKey": "6A6",
+  "parentKey": "COULD_BE_PRODUCT_KEY",
+  "title": "v4",
+  "subtitle": "key: 6A6",
+  "expanded": false
+}, {
+  "uniqueKey": "7A",
+  "parentKey": "6A6",
+  "title": "v4.1",
+  "subtitle": "key: 7A7",
+  "expanded": false
+}]

@@ -98,7 +98,7 @@ class App extends Component {
 
   createPathFromFlattenTreeData() {
     const {
-      flatTreeData
+      flatTreeData,
     } = this.state;
 
     if (flatTreeData.length <= 0) {
@@ -110,22 +110,32 @@ class App extends Component {
     const parentKey = this.state.parentKey;
 
     // get parent node for a node
-    const getDirectParentNode = node => flatTreeData.find(parent => parent[nodeKey] = node[parentKey]);
+    const getDirectParentNode   = node => flatTreeData.find(parent => parent[nodeKey] = node[parentKey]);
     // get parent key for a node;
-    const getDirectParentNodeKey = node => getDirectParentNode(node)[nodeKey];
+    const getDirectParentNodeKey = node => node[parentKey];
 
-    const getAllNodeKeysIntoArray = flatTreeData.map((node => node[nodeKey]));
-    const getAllDistinctParentKeys = flatTreeData.reduce(
+    const getAllNodeKeysIntoArray   = flatTreeData.map((node => node[nodeKey]));
+
+    const getAllDistinctParentKeys  = flatTreeData.reduce(
       (result, nextNode) => {
-        return result.some(cleParent => cleParent === nextNode[parentKey])
+        if (nextNode[parentKey] === rootKey) {
+          return result;
+        }
+
+        return result.some(cleParent => cleParent === nextNode[parentKey])  
           ? result
           : [...result, nextNode[parentKey]];
       },
       []
     );
 
-
-
+    
+    // if (getDirectParentNodeKey(flatTreeData[0]) !== rootKey) {
+    //   //
+    // } else {
+    //   // path = [] if direct
+    //   return [];
+    // }
 
     // const hasParent     = node => thisNode[parentKey] !== rootKey
 

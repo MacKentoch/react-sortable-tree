@@ -3,7 +3,8 @@
 import React, { Component } from 'react';
 import SortableTree, { toggleExpandedForAll } from '../../index';
 import { 
-  getFlatDataFromTree
+  getFlatDataFromTree,
+  changeNodeAtPath
 } from '../../utils/tree-data-utils';
 import styles from './stylesheets/app.scss';
 import '../shared/favicon/apple-touch-icon.png';
@@ -24,20 +25,23 @@ class App extends Component {
       searchString: '',
       searchFocusIndex: 0,
       searchFoundCount: null,
+      parentNodeWhereAddingNode: '0A0',
+      childNodeTitleToAdd: '',
+
       treeData: [
         {
-          uniqueKey: '0A',
+          uniqueKey: '0A0',
           title: '`title`',
           subtitle: '`subtitle`',
           expanded: true,
           children: [
             {
-              uniqueKey: '1A',
+              uniqueKey: '1A1',
               title: 'Child Node',
               subtitle: 'Defined in `children` array belonging to parent',
             },
             {
-              uniqueKey: '2A',
+              uniqueKey: '2A2',
               title: 'Nested structure is rendered virtually',
               subtitle: (
                 <span>
@@ -52,25 +56,24 @@ class App extends Component {
           ],
         },
         {
-          uniqueKey: '3A',
+          uniqueKey: '3A3',
           expanded: true,
           title: 'Any node can be the parent or child of any other node',
           children: [
             {
-              uniqueKey: '4A',
+              uniqueKey: '4A4',
               expanded: true,
-              title: 'Chicken',
-              children: [{ title: 'Egg' }],
+              title: 'Chicken'
             },
           ],
         },
         {
-          uniqueKey: '5A',
+          uniqueKey: '5A5',
           title: 'Button(s) can be added to the node',
           subtitle: 'Node info is passed when generating so you can use it in your onClick handler',
         },
         {
-          uniqueKey: '6A',
+          uniqueKey: '6A6',
           title: 'Show node children by setting `expanded`',
           subtitle: ({ node }) => `expanded: ${node.expanded ? 'true' : 'false'}`,
           children: [
@@ -108,7 +111,6 @@ class App extends Component {
 
   updateTreeData(treeData) {
     this.setState({ treeData });
-
     console.log('update tree event, changed treeData: ', treeData);
 
     // console.log('flat tree data: ', getFlatDataFromTree(
@@ -178,9 +180,64 @@ class App extends Component {
         <section className={styles['main-content']}>
           <h3>Demo</h3>
           <h4>
-            customs actions
+            add node under parent test
           </h4>
-          <button>new actions</button>
+          <div style={{ display: 'inline-block' }}>
+            <span style={{ width: '120px' }}>
+              parent node: 
+            </span>
+            <input 
+              type="text"
+              value={this.state.parentNodeWhereAddingNode}
+              onChange={({ target: { value } }) => (this.setState({ parentNodeWhereAddingNode: value.trim() }))}
+            />
+          </div>
+          <div style={{ display: 'inline-block' }}>
+            <span style={{ width: '120px' }}>
+              new child node title: 
+            </span>
+            <input 
+              type="text"
+              value={this.state.childNodeTitleToAdd}
+              onChange={({ target: { value } }) => (this.setState({ childNodeTitleToAdd: value.trim() }))}
+            />
+            <button
+              onClick={
+                (e) => {
+                  e.preventDefault();
+
+                  const {
+                    treeData: currentTreeData,
+                    childNodeTitleToAdd,
+                    parentNodeWhereAddingNode
+                    } = this.state;
+
+                  const newNode = {
+                    uniqueKey: '9999',
+                    title:     childNodeTitleToAdd
+                  }
+
+                  const parentKey       = parentNodeWhereAddingNode;
+                  const ignoreCollapsed = false;
+                  const expandParent    = false;
+                  const getNodeKey      = ({ node }) => (node.uniqueKey);
+
+                  const treeDataUpdated = changeNodeAtPath({
+                    currentTreeData,
+                    newNode,
+                    parentKey,
+                    getNodeKey,
+                    ignoreCollapsed,
+                    expandParent
+                  });
+
+                  this.setState({ treeData: treeDataUpdated });
+                }
+              }
+            >
+              add childNode
+            </button>
+          </div>
           <h4>
             demo actions
           </h4>

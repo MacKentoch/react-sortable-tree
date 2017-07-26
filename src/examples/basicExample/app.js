@@ -4,6 +4,7 @@ import React, { Component } from 'react';
 import SortableTree, { toggleExpandedForAll } from '../../index';
 import { 
   getFlatDataFromTree,
+  getTreeFromFlatData,
   changeNodeAtPath
 } from '../../utils/tree-data-utils';
 import styles from './stylesheets/app.scss';
@@ -113,11 +114,24 @@ class App extends Component {
     this.setState({ treeData });
     console.log('update tree event, changed treeData: ', treeData);
 
-    // console.log('flat tree data: ', getFlatDataFromTree(
-    //   treeData,
-    //   ({ node }) => node.uniqueKey,
-    //   true
-    // ));
+    const getNodeKey = ({ node }) => node.uniqueKey;
+
+    const flatDataFromTree = getFlatDataFromTree({
+      treeData,
+      getNodeKey,
+      ignoreCollapsed: false
+    });
+
+    console.log('flat tree data from updated tree: ',  flatDataFromTree);
+
+    const treeFromFlatData = getTreeFromFlatData({
+      flatData:     flatDataFromTree,
+      getKey:       getNodeKey,
+      getParentKey: node => node.parentId,
+      rootKey:      '0'
+    });
+
+    console.log('tree data from flat data of updated tree: ',  treeFromFlatData);
   }
 
   render() {

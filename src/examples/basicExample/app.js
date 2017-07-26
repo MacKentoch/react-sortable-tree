@@ -1,5 +1,10 @@
+// @flow weak
+
 import React, { Component } from 'react';
 import SortableTree, { toggleExpandedForAll } from '../../index';
+import { 
+  getFlatDataFromTree
+} from '../../utils/tree-data-utils';
 import styles from './stylesheets/app.scss';
 import '../shared/favicon/apple-touch-icon.png';
 import '../shared/favicon/favicon-16x16.png';
@@ -21,15 +26,18 @@ class App extends Component {
       searchFoundCount: null,
       treeData: [
         {
+          uniqueKey: '0A',
           title: '`title`',
           subtitle: '`subtitle`',
           expanded: true,
           children: [
             {
+              uniqueKey: '1A',
               title: 'Child Node',
               subtitle: 'Defined in `children` array belonging to parent',
             },
             {
+              uniqueKey: '2A',
               title: 'Nested structure is rendered virtually',
               subtitle: (
                 <span>
@@ -44,10 +52,12 @@ class App extends Component {
           ],
         },
         {
+          uniqueKey: '3A',
           expanded: true,
           title: 'Any node can be the parent or child of any other node',
           children: [
             {
+              uniqueKey: '4A',
               expanded: true,
               title: 'Chicken',
               children: [{ title: 'Egg' }],
@@ -55,100 +65,28 @@ class App extends Component {
           ],
         },
         {
+          uniqueKey: '5A',
           title: 'Button(s) can be added to the node',
-          subtitle:
-            'Node info is passed when generating so you can use it in your onClick handler',
+          subtitle: 'Node info is passed when generating so you can use it in your onClick handler',
         },
         {
+          uniqueKey: '6A',
           title: 'Show node children by setting `expanded`',
-          subtitle: ({ node }) =>
-            `expanded: ${node.expanded ? 'true' : 'false'}`,
+          subtitle: ({ node }) => `expanded: ${node.expanded ? 'true' : 'false'}`,
           children: [
             {
+              uniqueKey: '7A',
               title: 'Bruce',
-              subtitle: ({ node }) =>
-                `expanded: ${node.expanded ? 'true' : 'false'}`,
-              children: [{ title: 'Bruce Jr.' }, { title: 'Brucette' }],
+              subtitle: ({ node }) => `expanded: ${node.expanded ? 'true' : 'false'}`,
             },
           ],
-        },
-        {
-          title: 'Advanced',
-          subtitle: 'Settings, behavior, etc.',
-          children: [
-            {
-              title: (
-                <div>
-                  <div
-                    style={{
-                      backgroundColor: 'gray',
-                      display: 'inline-block',
-                      borderRadius: 10,
-                      color: '#FFF',
-                      padding: '0 5px',
-                    }}
-                  >
-                    Any Component
-                  </div>
-                  &nbsp;can be used for `title`
-                </div>
-              ),
-            },
-            {
-              expanded: true,
-              title: 'Limit nesting with `maxDepth`',
-              subtitle: `It's set to ${maxDepth} for this example`,
-              children: [
-                {
-                  expanded: true,
-                  title: renderDepthTitle,
-                  children: [
-                    {
-                      expanded: true,
-                      title: renderDepthTitle,
-                      children: [
-                        { title: renderDepthTitle },
-                        {
-                          title: ({ path }) =>
-                            path.length >= maxDepth
-                              ? 'This cannot be dragged deeper'
-                              : 'This can be dragged deeper',
-                        },
-                      ],
-                    },
-                  ],
-                },
-              ],
-            },
-            {
-              title:
-                'Disable dragging on a per-node basis with the `canDrag` prop',
-              subtitle: 'Or set it to false to disable all dragging.',
-              noDragging: true,
-            },
-            {
-              title: 'You cannot give this children',
-              subtitle:
-                'Dropping is prevented via the `canDrop` API using `nextParent`',
-              noChildren: true,
-            },
-            {
-              title:
-                'When node contents are really long, it will cause a horizontal scrollbar' +
-                ' to appear. Deeply nested elements will also trigger the scrollbar.',
-            },
-          ],
-        },
+        }
       ],
     };
 
     this.updateTreeData = this.updateTreeData.bind(this);
     this.expandAll = this.expandAll.bind(this);
     this.collapseAll = this.collapseAll.bind(this);
-  }
-
-  updateTreeData(treeData) {
-    this.setState({ treeData });
   }
 
   expand(expanded) {
@@ -166,6 +104,18 @@ class App extends Component {
 
   collapseAll() {
     this.expand(false);
+  }
+
+  updateTreeData(treeData) {
+    this.setState({ treeData });
+
+    console.log('update tree event, changed treeData: ', treeData);
+
+    // console.log('flat tree data: ', getFlatDataFromTree(
+    //   treeData,
+    //   ({ node }) => node.uniqueKey,
+    //   true
+    // ));
   }
 
   render() {
@@ -227,8 +177,16 @@ class App extends Component {
 
         <section className={styles['main-content']}>
           <h3>Demo</h3>
+          <h4>
+            customs actions
+          </h4>
+          <button>new actions</button>
+          <h4>
+            demo actions
+          </h4>
           <button onClick={this.expandAll}>Expand All</button>
           <button onClick={this.collapseAll}>Collapse All</button>
+          <button onClick={this.generateNodeInfo}>Generate node info</button>
           &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
           <form
             style={{ display: 'inline-block' }}
@@ -275,7 +233,8 @@ class App extends Component {
               treeData={treeData}
               onChange={this.updateTreeData}
               onMoveNode={({ node, treeIndex, path }) =>
-                global.console.debug(
+                console.log(
+                  'Event onMoveNode ---> ',
                   'node:',
                   node,
                   'treeIndex:',
@@ -296,6 +255,7 @@ class App extends Component {
                     matches.length > 0 ? searchFocusIndex % matches.length : 0,
                 })}
               isVirtualized={isVirtualized}
+              getNodeKey={({ node }) => node.uniqueKey }
               generateNodeProps={rowInfo => ({
                 buttons: [
                   <button
@@ -339,6 +299,17 @@ class App extends Component {
       </div>
     );
   }
+  // generateNodeInfo = ({
+  //   node: object,
+  //   path: number[] or string[],
+  //   treeIndex: number,
+  //   lowerSiblingCounts:
+  //   number[],
+  //   isSearchMatch: bool,
+  //   isSearchFocus: bool
+  // }) => {
+
+  // }
 }
 
 export default App;

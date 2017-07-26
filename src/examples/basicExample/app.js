@@ -32,18 +32,18 @@ class App extends Component {
       treeData: [
         {
           uniqueKey: '0A0',
-          title: '`title`',
+          title: '`0A0 - title`',
           subtitle: '`subtitle`',
           expanded: true,
           children: [
             {
               uniqueKey: '1A1',
-              title: 'Child Node',
+              title: '1A1 - Child Node',
               subtitle: 'Defined in `children` array belonging to parent',
             },
             {
               uniqueKey: '2A2',
-              title: 'Nested structure is rendered virtually',
+              title: '2A2 - Nested structure is rendered virtually',
               subtitle: (
                 <span>
                   The tree uses&nbsp;
@@ -59,28 +59,28 @@ class App extends Component {
         {
           uniqueKey: '3A3',
           expanded: true,
-          title: 'Any node can be the parent or child of any other node',
+          title: '3A3 - Any node can be the parent or child of any other node',
           children: [
             {
               uniqueKey: '4A4',
               expanded: true,
-              title: 'Chicken'
+              title: '4A4 - Chicken'
             },
           ],
         },
         {
           uniqueKey: '5A5',
-          title: 'Button(s) can be added to the node',
+          title: '5A5 - Button(s) can be added to the node',
           subtitle: 'Node info is passed when generating so you can use it in your onClick handler',
         },
         {
           uniqueKey: '6A6',
-          title: 'Show node children by setting `expanded`',
+          title: '6A6 - Show node children by setting `expanded`',
           subtitle: ({ node }) => `expanded: ${node.expanded ? 'true' : 'false'}`,
           children: [
             {
               uniqueKey: '7A',
-              title: 'Bruce',
+              title: '7A7 - Bruce',
               subtitle: ({ node }) => `expanded: ${node.expanded ? 'true' : 'false'}`,
             },
           ],
@@ -114,21 +114,37 @@ class App extends Component {
     this.setState({ treeData });
     console.log('update tree event, changed treeData: ', treeData);
 
-    const getNodeKey = ({ node }) => node.uniqueKey;
+    const getNodeKey = ({ node }) =>  node.uniqueKey;
+
+    const ROOT_NODE_KEY = '00000'; // parent node "virtual" (or default parent or level 0 parent) to all nodes
 
     const flatDataFromTree = getFlatDataFromTree({
       treeData,
       getNodeKey,
       ignoreCollapsed: false
     });
-
-    console.log('flat tree data from updated tree: ',  flatDataFromTree);
+  
+    const cleanFlatData = (flatData = []) => 
+      flatData.map(
+        node => ({
+          // keys or indexes:
+          uniqueKey: node.node.uniqueKey,
+          parentKey: node.parentNode ? node.parentNode.uniqueKey : ROOT_NODE_KEY,
+          // react-sortable-tree node props:
+          title:    node.node.title,
+          subtitle: node.node.subTitle ? node.subTitle : '',
+          expanded: node.node.expanded ? node.node.expanded : false
+        })
+      );
+    
+    console.log('RAW flat tree data from updated tree: ',  flatDataFromTree);
+    console.log('CLEANED flat tree data from updated tree: ',  cleanFlatData(flatDataFromTree));
 
     const treeFromFlatData = getTreeFromFlatData({
       flatData:     flatDataFromTree,
-      getKey:       getNodeKey,
-      getParentKey: node => node.parentId,
-      rootKey:      '0'
+      getKey:       node => node.uniqueKey,
+      getParentKey: node => node.parentKey,
+      rootKey:      ROOT_NODE_KEY
     });
 
     console.log('tree data from flat data of updated tree: ',  treeFromFlatData);
@@ -234,7 +250,7 @@ class App extends Component {
                   const parentKey       = parentNodeWhereAddingNode;
                   const ignoreCollapsed = false;
                   const expandParent    = false;
-                  const getNodeKey      = ({ node }) => (node.uniqueKey);
+                  const getNodeKey      = ({ node }) => node.uniqueKey;
 
                   const treeDataUpdated = changeNodeAtPath({
                     currentTreeData,
@@ -326,7 +342,7 @@ class App extends Component {
                     matches.length > 0 ? searchFocusIndex % matches.length : 0,
                 })}
               isVirtualized={isVirtualized}
-              getNodeKey={({ node }) => node.uniqueKey }
+              getNodeKey={({ node }) => node.uniqueKey  }
               generateNodeProps={rowInfo => ({
                 buttons: [
                   <button

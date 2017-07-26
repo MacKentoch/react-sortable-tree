@@ -208,7 +208,7 @@ class App extends Component {
           product:  node.product,
           // react-sortable-tree node props:
           title:    node.name,
-          subtitle: node.subtitle ? node.subtitle : '',
+          subtitle: node.product ? `product: ${node.product}` : '',
           expanded: node.expanded ? node.expanded : false
         })
       );
@@ -247,18 +247,22 @@ class App extends Component {
           const nodeToReturn = {
             // keys or indexes:
             _id: node.node[nodeKey],
-            parent: node[parentKey] ? node[parentKey][nodeKey] : rootKey,
+            product: node.node.product,
             // react-sortable-tree node props:
             name:    node.node.title,
-            subtitle: node.node.subtitle ? node.node.subtitle : '',
-            expanded: node.node.expanded ? node.node.expanded : false
+            // subtitle: node.node.subtitle ? node.node.subtitle : '',
+            // expanded: node.node.expanded ? node.node.expanded : false
           };
+
           // no need for virtual root key in backend, so delete it
-          if (nodeToReturn[parent] === rootKey) {
-            delete nodeToReturn[parent];
+          if (node.node[parentKey] === rootKey) {
+            return nodeToReturn;
           }
 
-          return nodeToReturn;
+          return {
+            ...nodeToReturn,
+            parent: node.node[parentKey] ? node.node[parentKey] : rootKey,
+          }
         }
       );
     }
@@ -278,6 +282,7 @@ class App extends Component {
     
     `);
     console.log('treeData');
+    console.log('raw flat data: ', flatDataFromTree);
     console.log('flatDataForBackEnd: ', flatDataForBackEnd);
   }
 

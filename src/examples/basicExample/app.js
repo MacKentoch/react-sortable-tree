@@ -29,60 +29,66 @@ class App extends Component {
       parentNodeWhereAddingNode: '0A0',
       childNodeTitleToAdd: '',
 
+      flatTreeData: [],
+      treeDataFromFlatData: [],
 
       rootKey: 'COULD_BE_PRODUCT_KEY',
-      treeData: [
-        {
-          uniqueKey: '0A0',
-          title: 'v1',
-          subtitle: 'key: 0A0',
-          expanded: true,
-          children: [
-            {
-              uniqueKey: '1A1',
-              title: 'v1.1',
-              subtitle: 'key: 1A1',
-              // subtitle: 'Defined in `children` array belonging to parent',
-            },
-            {
-              uniqueKey: '2A2',
-              title: 'v1.2',
-              subtitle: 'key: 2A2',
-            },
-          ],
-        },
-        {
-          uniqueKey: '3A3',
-          expanded: true,
-          title: 'v2.1',
-          subtitle: 'key: 3A3',
-          children: [
-            {
-              uniqueKey: '4A4',
-              expanded: true,
-              title: '2.1.1',
-              subtitle: 'key: 4A4',
-            },
-          ],
-        },
-        {
-          uniqueKey: '5A5',
-          title: 'v3',
-          subtitle: 'key: 5A5',
-        },
-        {
-          uniqueKey: '6A6',
-          title: 'v4',
-          subtitle: 'key: 6A6',
-          children: [
-            {
-              uniqueKey: '7A',
-              title: 'v4.1',
-              subtitle: 'key: 7A7',
-            },
-          ],
-        }
-      ],
+
+      treeData: [ { "uniqueKey": "0A0", "parentKey": "COULD_BE_PRODUCT_KEY", "title": "v1", "subtitle": "key: 0A0", "expanded": true, "children": [ { "uniqueKey": "1A1", "parentKey": "0A0", "title": "v1.1", "subtitle": "key: 1A1", "expanded": false } ] }, { "uniqueKey": "2A2", "parentKey": "COULD_BE_PRODUCT_KEY", "title": "v1.2", "subtitle": "key: 2A2", "expanded": false }, { "uniqueKey": "3A3", "parentKey": "COULD_BE_PRODUCT_KEY", "title": "v2.1", "subtitle": "key: 3A3", "expanded": true, "children": [ { "uniqueKey": "4A4", "parentKey": "3A3", "title": "2.1.1", "subtitle": "key: 4A4", "expanded": true } ] }, { "uniqueKey": "5A5", "parentKey": "COULD_BE_PRODUCT_KEY", "title": "v3", "subtitle": "key: 5A5", "expanded": false }, { "uniqueKey": "6A6", "parentKey": "COULD_BE_PRODUCT_KEY", "title": "v4", "subtitle": "key: 6A6", "expanded": false, "children": [ { "uniqueKey": "7A", "parentKey": "6A6", "title": "v4.1", "subtitle": "key: 7A7", "expanded": false } ] } ],
+
+      // treeData: [
+      //   {
+      //     uniqueKey: '0A0',
+      //     parentKey: 'COULD_BE_PRODUCT_KEY',
+      //     title: 'v1',
+      //     subtitle: 'key: 0A0',
+      //     expanded: true,
+      //     children: [
+      //       {
+      //         uniqueKey: '1A1',
+      //         title: 'v1.1',
+      //         subtitle: 'key: 1A1',
+      //         // subtitle: 'Defined in `children` array belonging to parent',
+      //       },
+      //       {
+      //         uniqueKey: '2A2',
+      //         title: 'v1.2',
+      //         subtitle: 'key: 2A2',
+      //       },
+      //     ],
+      //   },
+      //   {
+      //     uniqueKey: '3A3',
+      //     expanded: true,
+      //     title: 'v2.1',
+      //     subtitle: 'key: 3A3',
+      //     children: [
+      //       {
+      //         uniqueKey: '4A4',
+      //         expanded: true,
+      //         title: '2.1.1',
+      //         subtitle: 'key: 4A4',
+      //       },
+      //     ],
+      //   },
+      //   {
+      //     uniqueKey: '5A5',
+      //     title: 'v3',
+      //     subtitle: 'key: 5A5',
+      //   },
+      //   {
+      //     uniqueKey: '6A6',
+      //     title: 'v4',
+      //     subtitle: 'key: 6A6',
+      //     children: [
+      //       {
+      //         uniqueKey: '7A',
+      //         title: 'v4.1',
+      //         subtitle: 'key: 7A7',
+      //       },
+      //     ],
+      //   }
+      // ],
     };
 
     this.updateTreeData = this.updateTreeData.bind(this);
@@ -144,14 +150,15 @@ class App extends Component {
       rootKey:      ROOT_NODE_KEY
     });
 
+    this.setState({ flatTreeData: cleanFlatData(flatDataFromTree) });
+    this.setState({ treeDataFromFlatData: treeFromFlatData });
+
     console.log('tree data from flat data of updated tree: ',  treeFromFlatData);
   }
 
   render() {
     const projectName = 'React Sortable Tree';
-    const authorName = 'Chris Fritz';
-    const authorUrl = 'https://github.com/fritz-c';
-    const githubUrl = 'https://github.com/fritz-c/react-sortable-tree';
+
 
     const {
       treeData,
@@ -359,6 +366,26 @@ class App extends Component {
                 ],
               })}
             />
+          </div>
+
+          <div style={{ display: 'inline-block' }}>
+              <div style={{ display: 'inline-block', width: '32%' }}>
+                {
+                    JSON.stringify(this.state.treeData, null, '\n')
+                }
+              </div>
+
+              <div style={{ display: 'inline-block', width: '32%' }}>
+                {
+                  JSON.stringify(this.state.flatTreeData, null, '\n')
+                }
+              </div>
+
+              <div style={{ display: 'inline-block', width: '32%' }}>
+                {
+                  JSON.stringify(this.state.treeDataFromFlatData, null, '\n')
+                }
+              </div>
           </div>
 
         </section>

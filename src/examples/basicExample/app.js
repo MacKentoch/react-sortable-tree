@@ -2,6 +2,7 @@
 
 import React, { Component } from 'react';
 import SortableTree, { toggleExpandedForAll } from '../../index';
+import TreeModel from 'tree-model';
 import { 
   getFlatDataFromTree,
   getTreeFromFlatData,
@@ -26,132 +27,100 @@ class App extends Component {
       searchString: '',
       searchFocusIndex: 0,
       searchFoundCount: null,
+
       parentNodeWhereAddingNode: '0A0',
       childNodeTitleToAdd: '',
 
-      flatTreeData: [],
-      treeDataFromFlatData: [],
-      nodeKey: 'uniqueKey',
-      parentKey: 'parentKey',
-
+      nodeKey: '_id',
+      parentKey: 'parent',
       rootKey: 'COULD_BE_PRODUCT_KEY',
 
-      treeData: [{
-        "uniqueKey": "0A0",
-        "parentKey": "COULD_BE_PRODUCT_KEY",
-        "title": "v1",
-        "subtitle": "key: 0A0",
-        "expanded": true,
-        "children": [{
-          "uniqueKey": "1A1",
-          "parentKey": "0A0",
-          "title": "v1.1",
-          "subtitle": "key: 1A1",
-          "expanded": true
-        }, {
-          "uniqueKey": "2A2",
-          "parentKey": "COULD_BE_PRODUCT_KEY",
-          "title": "v1.2",
-          "subtitle": "key: 2A2",
-          "expanded": false
-        }]
-      }, {
-        "uniqueKey": "3A3",
-        "parentKey": "COULD_BE_PRODUCT_KEY",
-        "title": "v2.1",
-        "subtitle": "key: 3A3",
-        "expanded": true,
-        "children": [{
-          "uniqueKey": "4A4",
-          "parentKey": "3A3",
-          "title": "2.1.1",
-          "subtitle": "key: 4A4",
-          "expanded": true
-        }]
-      }, {
-        "uniqueKey": "5A5",
-        "parentKey": "COULD_BE_PRODUCT_KEY",
-        "title": "v3",
-        "subtitle": "key: 5A5",
-        "expanded": false
-      }, {
-        "uniqueKey": "6A6",
-        "parentKey": "COULD_BE_PRODUCT_KEY",
-        "title": "v4",
-        "subtitle": "key: 6A6",
-        "expanded": false,
-        "children": [{
-          "uniqueKey": "7A",
-          "parentKey": "6A6",
-          "title": "v4.1",
-          "subtitle": "key: 7A7",
-          "expanded": false
-        }]
-      }]
+      flatTreeData: [
+        {
+          "_id" : "5978aba17d06e6a456496e32",
+          "name": "2",
+          "product" : "5978aba17d06e6a456496e31"
+        },
+        {
+          "_id" : "5978aba17d06e6a456496e33",
+          "name": "2.1",
+          "product" : "5978aba17d06e6a456496e31",
+          "parent" : "5978aba17d06e6a456496e32"
+        },
+        {
+          "_id" : "5978aba17d06e6a456496e34",
+          "name": "2.1.1",
+          "product" : "5978aba17d06e6a456496e31",
+          "parent" : "5978aba17d06e6a456496e33"
+        }
+      ],
+      treeData: [],
+      treeDataFromFlatData: [],
+      
+      // treeData: [{
+      //   "uniqueKey": "0A0",
+      //   "parentKey": "COULD_BE_PRODUCT_KEY",
+      //   "title": "v1",
+      //   "subtitle": "key: 0A0",
+      //   "expanded": true,
+      //   "children": [{
+      //     "uniqueKey": "1A1",
+      //     "parentKey": "0A0",
+      //     "title": "v1.1",
+      //     "subtitle": "key: 1A1",
+      //     "expanded": true
+      //   }, {
+      //     "uniqueKey": "2A2",
+      //     "parentKey": "COULD_BE_PRODUCT_KEY",
+      //     "title": "v1.2",
+      //     "subtitle": "key: 2A2",
+      //     "expanded": false
+      //   }]
+      //   }, {
+      //     "uniqueKey": "3A3",
+      //     "parentKey": "COULD_BE_PRODUCT_KEY",
+      //     "title": "v2.1",
+      //     "subtitle": "key: 3A3",
+      //     "expanded": true,
+      //     "children": [{
+      //       "uniqueKey": "4A4",
+      //       "parentKey": "3A3",
+      //       "title": "2.1.1",
+      //       "subtitle": "key: 4A4",
+      //       "expanded": true
+      //     }]
+      //   }, {
+      //     "uniqueKey": "5A5",
+      //     "parentKey": "COULD_BE_PRODUCT_KEY",
+      //     "title": "v3",
+      //     "subtitle": "key: 5A5",
+      //     "expanded": false
+      //   }, {
+      //     "uniqueKey": "6A6",
+      //     "parentKey": "COULD_BE_PRODUCT_KEY",
+      //     "title": "v4",
+      //     "subtitle": "key: 6A6",
+      //     "expanded": false,
+      //     "children": [{
+      //       "uniqueKey": "7A",
+      //       "parentKey": "6A6",
+      //       "title": "v4.1",
+      //       "subtitle": "key: 7A7",
+      //       "expanded": false
+      //     }]
+      //   }
+      // ]
     };
 
     this.updateTreeData = this.updateTreeData.bind(this);
     this.expandAll = this.expandAll.bind(this);
     this.collapseAll = this.collapseAll.bind(this);
-    this.createPathFromFlattenTreeData = this.createPathFromFlattenTreeData.bind(this);
+    this.initTreeDataFromFlatData = this.initTreeDataFromFlatData.bind(this);
+    this.sendFlatDataToBackEnd = this.sendFlatDataToBackEnd.bind(this);
   }
 
-  createPathFromFlattenTreeData() {
-    const {
-      flatTreeData,
-    } = this.state;
-
-    if (flatTreeData.length <= 0) {
-      return console.warn('flat treeData is empty now...');
-    }
-    
-    const rootKey   = this.state.rootKey;
-    const nodeKey   = this.state.nodeKey;
-    const parentKey = this.state.parentKey;
-
-    // get parent node for a node
-    const getDirectParentNode   = node => flatTreeData.find(parent => parent[nodeKey] = node[parentKey]);
-    // get parent key for a node;
-    const getDirectParentNodeKey = node => node[parentKey];
-
-    const getAllNodeKeysIntoArray   = flatTreeData.map((node => node[nodeKey]));
-
-    const getAllDistinctParentKeys  = flatTreeData.reduce(
-      (result, nextNode) => {
-        if (nextNode[parentKey] === rootKey) {
-          return result;
-        }
-
-        return result.some(cleParent => cleParent === nextNode[parentKey])  
-          ? result
-          : [...result, nextNode[parentKey]];
-      },
-      []
-    );
-
-    
-    // if (getDirectParentNodeKey(flatTreeData[0]) !== rootKey) {
-    //   //
-    // } else {
-    //   // path = [] if direct
-    //   return [];
-    // }
-
-    // const hasParent     = node => thisNode[parentKey] !== rootKey
-
-    // const test = flatTreeData
-    //                 .map(node => {
-    //                    const parentNode =  getParentNode();
-    //                    if (hasParent(parentNode)) {
-
-    //                    }
-                       
-    //                 })
-
-    //                 .reduce((prevList, nextNode) => [...prevList, nextNode], [])
-    //                 .reverse();
-    console.log('createPathFromFlattenTreeData: getAllDistinctParentKeys: ', getAllDistinctParentKeys);
-    console.log('getAllNodeKeysIntoArray: ', getAllNodeKeysIntoArray);
+  componentDidMount() {
+    this.initTreeDataFromFlatData();
   }
 
   expand(expanded) {
@@ -173,45 +142,143 @@ class App extends Component {
 
   updateTreeData(treeData) {
     this.setState({ treeData });
-    console.log('update tree event, changed treeData: ', treeData);
 
-    const getNodeKey = ({ node }) =>  node.uniqueKey;
+    ////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////
+    // console.log('update tree event, changed treeData: ', treeData);
 
-    const ROOT_NODE_KEY = this.state.rootKey; // parent node "virtual" (or default parent or level 0 parent) to all nodes
+    // const getNodeKey = ({ node }) =>  node.uniqueKey;
 
+    // const ROOT_NODE_KEY = this.state.rootKey; // parent node "virtual" (or default parent or level 0 parent) to all nodes
+
+    // const flatDataFromTree = getFlatDataFromTree({
+    //   treeData,
+    //   getNodeKey,
+    //   ignoreCollapsed: false
+    // });
+  
+    // const cleanFlatData = (flatData = []) => 
+    //   flatData.map(
+    //     node => ({
+    //       // keys or indexes:
+    //       _id: node.node[],
+    //       parentKey: node.parentNode ? node.parentNode.uniqueKey : ROOT_NODE_KEY,
+    //       // react-sortable-tree node props:
+    //       title:    node.node.title,
+    //       subtitle: node.node.subtitle ? node.node.subtitle : '',
+    //       expanded: node.node.expanded ? node.node.expanded : false
+    //     })
+    //   );
+    
+    // console.log('RAW flat tree data from updated tree: ',  flatDataFromTree);
+    // console.log('CLEANED flat tree data from updated tree: ',  cleanFlatData(flatDataFromTree));
+
+    // const treeFromFlatData = getTreeFromFlatData({
+    //   flatData:     cleanFlatData(flatDataFromTree),
+    //   getKey:       node => node.uniqueKey,
+    //   getParentKey: node => node.parentKey,
+    //   rootKey:      ROOT_NODE_KEY
+    // });
+
+    // this.setState({ flatTreeData: cleanFlatData(flatDataFromTree) });
+    // this.setState({ treeDataFromFlatData: treeFromFlatData });
+
+    // console.log('tree data from flat data of updated tree: ',  treeFromFlatData);
+
+    ////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////
+  }
+
+  initTreeDataFromFlatData() {
+    const {
+      rootKey,
+      nodeKey,
+      parentKey,
+      flatTreeData
+    } = this.state;
+
+    function prepareFlatDataForFront(flatData = []) {
+      return flatData.map(
+        node => ({
+          // keys or indexes:
+          _id:      node[nodeKey],
+          parent:   node[parentKey] ? node[parentKey] : rootKey,
+          product:  node.product,
+          // react-sortable-tree node props:
+          title:    node.name,
+          subtitle: node.subtitle ? node.subtitle : '',
+          expanded: node.expanded ? node.expanded : false
+        })
+      );
+    }
+
+    const treeData = getTreeFromFlatData({
+      flatData:     prepareFlatDataForFront(flatTreeData),
+      getKey:       node => node[nodeKey],
+      getParentKey: node => node[parentKey],
+      rootKey
+    });
+
+    
+    console.log(`
+    
+      INIT TREEDATA (IN FRONT from BACKEND DATA)
+    
+    `);
+    console.log('flatTreeData: ', flatTreeData);
+    console.log('treeData: ', treeData);
+
+    this.setState({ treeData });
+  }
+
+  sendFlatDataToBackEnd() {
+    const {
+      rootKey,
+      nodeKey,
+      parentKey,
+      treeData
+    } = this.state;
+
+    function prepareFlatDataForBackend(flatData = []) {
+      return flatData.map(
+        node => {
+          const nodeToReturn = {
+            // keys or indexes:
+            _id: node.node[nodeKey],
+            parent: node[parentKey] ? node[parentKey][nodeKey] : rootKey,
+            // react-sortable-tree node props:
+            name:    node.node.title,
+            subtitle: node.node.subtitle ? node.node.subtitle : '',
+            expanded: node.node.expanded ? node.node.expanded : false
+          };
+          // no need for virtual root key in backend, so delete it
+          if (nodeToReturn[parent] === rootKey) {
+            delete nodeToReturn[parent];
+          }
+
+          return nodeToReturn;
+        }
+      );
+    }
+
+    const getNodeKey = ({ node }) =>  node[nodeKey];
     const flatDataFromTree = getFlatDataFromTree({
       treeData,
       getNodeKey,
       ignoreCollapsed: false
     });
-  
-    const cleanFlatData = (flatData = []) => 
-      flatData.map(
-        node => ({
-          // keys or indexes:
-          uniqueKey: node.node.uniqueKey,
-          parentKey: node.parentNode ? node.parentNode.uniqueKey : ROOT_NODE_KEY,
-          // react-sortable-tree node props:
-          title:    node.node.title,
-          subtitle: node.node.subtitle ? node.node.subtitle : '',
-          expanded: node.node.expanded ? node.node.expanded : false
-        })
-      );
+
+    const flatDataForBackEnd = prepareFlatDataForBackend(flatDataFromTree);
+
+    console.log(`
     
-    console.log('RAW flat tree data from updated tree: ',  flatDataFromTree);
-    console.log('CLEANED flat tree data from updated tree: ',  cleanFlatData(flatDataFromTree));
-
-    const treeFromFlatData = getTreeFromFlatData({
-      flatData:     cleanFlatData(flatDataFromTree),
-      getKey:       node => node.uniqueKey,
-      getParentKey: node => node.parentKey,
-      rootKey:      ROOT_NODE_KEY
-    });
-
-    this.setState({ flatTreeData: cleanFlatData(flatDataFromTree) });
-    this.setState({ treeDataFromFlatData: treeFromFlatData });
-
-    console.log('tree data from flat data of updated tree: ',  treeFromFlatData);
+      SENT TREEDATA (TO BACKEND)
+    
+    `);
+    console.log('treeData');
+    console.log('flatDataForBackEnd: ', flatDataForBackEnd);
   }
 
   render() {
@@ -312,7 +379,7 @@ class App extends Component {
                   const parentKey       = parentNodeWhereAddingNode;
                   const ignoreCollapsed = false;
                   const expandParent    = false;
-                  const getNodeKey      = ({ node }) => node.uniqueKey;
+                  const getNodeKey      = ({ node }) => node._id;
 
                   const treeDataUpdated = changeNodeAtPath({
                     currentTreeData,
@@ -335,7 +402,8 @@ class App extends Component {
           </h4>
           <button onClick={this.expandAll}>Expand All</button>
           <button onClick={this.collapseAll}>Collapse All</button>
-          <button onClick={this.createPathFromFlattenTreeData}>test something</button>
+          <p>SIMULATE SEND DATA TO BACKEND</p>
+           <button onClick={this.sendFlatDataToBackEnd}>send treeData to backend</button> 
           &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
           <form
             style={{ display: 'inline-block' }}
@@ -410,7 +478,7 @@ class App extends Component {
                     matches.length > 0 ? searchFocusIndex % matches.length : 0,
                 })}
               isVirtualized={isVirtualized}
-              getNodeKey={({ node }) => node.uniqueKey  }
+              getNodeKey={({ node }) => node._id  }
               generateNodeProps={rowInfo => ({
                 buttons: [
                   <button

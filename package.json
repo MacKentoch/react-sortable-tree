@@ -50,7 +50,8 @@
     "react-dnd": "^2.1.4",
     "react-dnd-html5-backend": "^2.1.2",
     "react-dnd-scrollzone": "^4.0.0",
-    "react-virtualized": "^9.9.0"
+    "react-virtualized": "^9.9.0",
+    "tree-model": "^1.0.6"
   },
   "peerDependencies": {
     "react": "^15.3.0",

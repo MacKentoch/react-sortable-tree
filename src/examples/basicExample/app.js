@@ -1,13 +1,18 @@
 // @flow weak
 
 import React, { Component } from 'react';
-import SortableTree, { toggleExpandedForAll } from '../../index';
-import TreeModel from 'tree-model';
-import { 
+import SortableTree, {
+  toggleExpandedForAll,
   getFlatDataFromTree,
   getTreeFromFlatData,
   changeNodeAtPath
-} from '../../utils/tree-data-utils';
+} from '../../index';
+import TreeModel from 'tree-model';
+// import { 
+//   getFlatDataFromTree,
+//   getTreeFromFlatData,
+//   changeNodeAtPath
+// } from '../../utils/tree-data-utils';
 import styles from './stylesheets/app.scss';
 import '../shared/favicon/apple-touch-icon.png';
 import '../shared/favicon/favicon-16x16.png';
@@ -56,60 +61,6 @@ class App extends Component {
       ],
       treeData: [],
       treeDataFromFlatData: [],
-      
-      // treeData: [{
-      //   "uniqueKey": "0A0",
-      //   "parentKey": "COULD_BE_PRODUCT_KEY",
-      //   "title": "v1",
-      //   "subtitle": "key: 0A0",
-      //   "expanded": true,
-      //   "children": [{
-      //     "uniqueKey": "1A1",
-      //     "parentKey": "0A0",
-      //     "title": "v1.1",
-      //     "subtitle": "key: 1A1",
-      //     "expanded": true
-      //   }, {
-      //     "uniqueKey": "2A2",
-      //     "parentKey": "COULD_BE_PRODUCT_KEY",
-      //     "title": "v1.2",
-      //     "subtitle": "key: 2A2",
-      //     "expanded": false
-      //   }]
-      //   }, {
-      //     "uniqueKey": "3A3",
-      //     "parentKey": "COULD_BE_PRODUCT_KEY",
-      //     "title": "v2.1",
-      //     "subtitle": "key: 3A3",
-      //     "expanded": true,
-      //     "children": [{
-      //       "uniqueKey": "4A4",
-      //       "parentKey": "3A3",
-      //       "title": "2.1.1",
-      //       "subtitle": "key: 4A4",
-      //       "expanded": true
-      //     }]
-      //   }, {
-      //     "uniqueKey": "5A5",
-      //     "parentKey": "COULD_BE_PRODUCT_KEY",
-      //     "title": "v3",
-      //     "subtitle": "key: 5A5",
-      //     "expanded": false
-      //   }, {
-      //     "uniqueKey": "6A6",
-      //     "parentKey": "COULD_BE_PRODUCT_KEY",
-      //     "title": "v4",
-      //     "subtitle": "key: 6A6",
-      //     "expanded": false,
-      //     "children": [{
-      //       "uniqueKey": "7A",
-      //       "parentKey": "6A6",
-      //       "title": "v4.1",
-      //       "subtitle": "key: 7A7",
-      //       "expanded": false
-      //     }]
-      //   }
-      // ]
     };
 
     this.updateTreeData = this.updateTreeData.bind(this);
@@ -214,6 +165,8 @@ class App extends Component {
       );
     }
 
+    console.log('prepared flatData: ', prepareFlatDataForFront(flatTreeData));
+
     const treeData = getTreeFromFlatData({
       flatData:     prepareFlatDataForFront(flatTreeData),
       getKey:       node => node[nodeKey],
@@ -268,6 +221,8 @@ class App extends Component {
     }
 
     const getNodeKey = ({ node }) =>  node[nodeKey];
+
+
     const flatDataFromTree = getFlatDataFromTree({
       treeData,
       getNodeKey,
@@ -470,32 +425,44 @@ class App extends Component {
                   'path:',
                   path
                 )}
-              maxDepth={maxDepth}
+              maxDepth={Infinity}
               searchQuery={searchString}
               searchFocusOffset={searchFocusIndex}
               canDrag={({ node }) => !node.noDragging}
               canDrop={({ nextParent }) =>
                 !nextParent || !nextParent.noChildren}
-              searchFinishCallback={matches =>
-                this.setState({
-                  searchFoundCount: matches.length,
-                  searchFocusIndex:
-                    matches.length > 0 ? searchFocusIndex % matches.length : 0,
-                })}
+
+              searchFinishCallback={
+                matches => {
+                  console.log('searchFinishCallback, matches: ', matches);
+                  this.setState({
+                    searchFoundCount: matches.length,
+                    searchFocusIndex:
+                      matches.length > 0 ? searchFocusIndex % matches.length : 0,
+                  });
+                }
+              }
               isVirtualized={isVirtualized}
               getNodeKey={({ node }) => node._id  }
-              generateNodeProps={rowInfo => ({
-                buttons: [
-                  <button
-                    style={{
-                      verticalAlign: 'middle',
-                    }}
-                    onClick={() => alertNodeInfo(rowInfo)}
-                  >
-                    ℹ
-                  </button>,
-                ],
-              })}
+              generateNodeProps={
+                rowInfo => {
+                  console.log('rowInfo: ', rowInfo);
+
+                  return {
+                    buttons: [
+                      <button
+                        style={{
+                          verticalAlign: 'middle',
+                        }}
+                        onClick={() => alertNodeInfo(rowInfo)}
+                      >
+                        ℹ
+                      </button>
+                    ]
+                  };
+
+                } 
+              }
             />
           </div>
 
